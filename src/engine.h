@@ -77,6 +77,9 @@ struct Options {
     int32_t maxBatchSize = 16;
     // GPU device index
     int deviceIndex = 0;
+    //Path to the TensorRT engine
+    std::string engineFileDir = "";
+
 };
 
 // Class used for int8 calibration

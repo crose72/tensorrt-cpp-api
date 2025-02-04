@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     // Specify the maximum batch size we plan on running.
     options.maxBatchSize = 1;
     // Specify the directory where you want the model engine model file saved.
+    //TODO: when compiling for c++11 this member doesn't seem to exist
     options.engineFileDir = ".";
 
     Engine<float> engine(options);

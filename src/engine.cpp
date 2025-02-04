@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iterator>
 #include <random>
+#include <spdlog/spdlog.h>
 
 using namespace nvinfer1;
 using namespace Util;
@@ -57,7 +58,7 @@ Int8EntropyCalibrator2::Int8EntropyCalibrator2(int32_t batchSize, int32_t inputW
     }
 
     // Randomize the calibration data
-    auto rd = std::random_device{};
+    std::random_device rd;
     auto rng = std::default_random_engine{rd()};
     std::shuffle(std::begin(m_imgPaths), std::end(m_imgPaths), rng);
 }
@@ -98,8 +99,9 @@ bool Int8EntropyCalibrator2::getBatch(void **bindings, const char **names, int32
 
     // Convert the batch from NHWC to NCHW
     // ALso apply normalization, scaling, and mean subtraction
-    auto mfloat = Engine<float>::blobFromGpuMats(inputImgs, m_subVals, m_divVals, m_normalize, true);
-    auto *dataPointer = mfloat.ptr<void>();
+    auto mfloat = Engine<float>::blobFromGpuMats(inputImgs, m_subVals, m_divVals, m_normalize);
+    auto *dataPointer = mfloat.ptr<unsigned char>();  // Instead of void
+
 
     // Copy the GPU buffer to member variable so that it persists
     checkCudaErrorCode(cudaMemcpyAsync(m_deviceInput, dataPointer, m_inputCount * sizeof(float), cudaMemcpyDeviceToDevice));
